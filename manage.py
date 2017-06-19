@@ -49,7 +49,7 @@ def cov():
     '''Run the unit tests with coverage.'''
     tests = unittest.TestLoader().discover('project/tests')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
-    if result.wasSuccessfull():
+    if result.wasSuccessful():
         COV.stop()
         COV.save()
         print('Coverage Summary: ')
@@ -58,10 +58,6 @@ def cov():
         COV.erase()
         return 0
     return 1
-
-
-
-
 
 
 
