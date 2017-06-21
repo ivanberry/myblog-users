@@ -10,7 +10,6 @@ db = SQLAlchemy()
 
 def create_app():
 
-
     # instantiate the app
     app = Flask(__name__)
 
