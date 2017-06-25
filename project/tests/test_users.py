@@ -193,11 +193,12 @@ class TestArticlesService(BaseTestCase):
 
         with self.client:
             response = self.client.get(f'/articles/{user.id}')
+            data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 200)
-            self.assertTrue(len(data['articles']), 1)
+            self.assertTrue(len(data['data']['articles']), 1)
             self.assertIn('test', data['data']['articles'][0]['title'])
             self.assertIn('This is tab\' first article', data['data']['articles'][0]['body'])
-            self.assertEqual(user_id, data['data']['articles'][0]['user_id'])
+            self.assertEqual(user.id, data['data']['articles'][0]['user_id'])
 
 
 

@@ -137,7 +137,7 @@ def get_all_posts():
 def get_user_articles(user_id):
     '''Get single user's articles'''
 
-    articles = Article.query.filter_by(user_id=user_id).all()
+    articles = Article.query.filter_by(user_id=int(user_id)).all()
     article_list = []
 
     for article in articles:
@@ -145,10 +145,11 @@ def get_user_articles(user_id):
             'id': article.id,
             'title': article.title,
             'body': article.body,
-            'pub_at': article.pub_at
+            'pub_at': article.pub_at,
+            'user_id': int(user_id)
         }
 
-        article_list.append(article)
+        article_list.append(article_object)
 
     response_object = {
         'status': 'success',
