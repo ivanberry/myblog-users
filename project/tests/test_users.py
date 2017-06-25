@@ -3,7 +3,7 @@
 import json
 from project.tests.base import BaseTestCase
 from project import db
-from project.api.models import User
+from project.api.models import User, Article
 import datetime
 
 def add_user(username, email, created_at=datetime.datetime.now()):
@@ -11,6 +11,12 @@ def add_user(username, email, created_at=datetime.datetime.now()):
     db.session.add(user)
     db.session.commit()
     return user
+
+def add_article(title, body, pub_at=datetime.datetime.utcnow()):
+    article = Article(title=title, body=body, pub_at=pub_at)
+    db.session.add(article)
+    db.session.commit()
+    return article
 
 class TestUsersService(BaseTestCase):
     '''Tests for the Users Services'''
@@ -145,6 +151,37 @@ class TestUsersService(BaseTestCase):
             self.assertIn('shirting', data['data']['users'][0]['username'])
             self.assertIn('shirting@gmail.com', data['data']['users'][0]['email'])
             self.assertIn('success', data['status'])
+
+
+class TestArticlesService(BaseTestCase):
+    def test_all_articles(self):
+        '''Ensure get all articles correctly'''
+        add_article('test', 'This is a test content')
+        add_article('test2', 'This is a another test content')
+        with self.client:
+            response = self.client.get('/articles')
+            data = json.loads(response.data.decode())
+
+            # asserts
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('success', data['status'])
+
+            # 数据条数
+            self.assertEqual(len(data['data']['articles']), 2)
+
+            # 返回是否包含created_at
+            self.assertTrue('pub_at' in data['data']['articles'][0])
+            self.assertTrue('pub_at' in data['data']['articles'][1])
+
+            # 对应的article是否在返回数据中
+            self.assertTrue('test' in data['data']['articles'][0]['title'])
+            self.assertIn('This is a test content', data['data']['articles'][0]['body'])
+            self.assertTrue('test2' in data['data']['articles'][1]['title'])
+            self.assertIn('This is a another test content', data['data']['articles'][1]['body'])
+
+
+
+
 
 
 

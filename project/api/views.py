@@ -1,7 +1,7 @@
 # project/api/views.py
 
 from flask import Blueprint, jsonify, request, make_response, render_template
-from project.api.models import User
+from project.api.models import User, Article
 from project import db
 from sqlalchemy import exc
 
@@ -108,4 +108,30 @@ def get_all_users():
     }
 
     return make_response(jsonify(response_object)), 200
+
+
+@users_blueprint.route('/articles', methods=['GET'])
+def get_all_posts():
+    '''Get all posts'''
+    articles = Article.query.all()
+    articles_list = []
+    for article in articles:
+        article_object = {
+            'id': article.id,
+            'title': article.title,
+            'body': article.body,
+            'pub_at': article.pub_at
+        }
+
+        articles_list.append(article_object)
+    response_object = {
+        'status': 'success',
+        'data': {
+            'articles': articles_list
+        }
+    }
+
+    return make_response(jsonify(response_object)), 200
+
+
 
