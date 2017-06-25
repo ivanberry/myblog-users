@@ -200,6 +200,15 @@ class TestArticlesService(BaseTestCase):
             self.assertIn('This is tab\' first article', data['data']['articles'][0]['body'])
             self.assertEqual(user.id, data['data']['articles'][0]['user_id'])
 
+    def test_get_articles_no_id(self):
+        '''Ensure correct message while get articles without user id'''
+        with self.client:
+            response = self.client.get(f'/articles/baba')
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 404)
+            self.assertIn('fail', data['status'])
+            self.assertIn('Cant find such user', data['message'])
+
 
 
 

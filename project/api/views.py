@@ -137,28 +137,46 @@ def get_all_posts():
 def get_user_articles(user_id):
     '''Get single user's articles'''
 
-    articles = Article.query.filter_by(user_id=int(user_id)).all()
-    article_list = []
-
-    for article in articles:
-        article_object = {
-            'id': article.id,
-            'title': article.title,
-            'body': article.body,
-            'pub_at': article.pub_at,
-            'user_id': int(user_id)
-        }
-
-        article_list.append(article_object)
-
     response_object = {
-        'status': 'success',
-        'data': {
-            'articles': article_list
-        }
+        'status': 'fail',
+        'message': 'Cant find such user'
     }
 
-    return make_response(jsonify(response_object)), 200
+    try:
+        user = User.query.filter_by(id=int(user_id)).first()
+
+        if not user:
+            return make_response(jsonify(response_object)), 404
+        else:
+            articles = Article.query.filter_by(user_id=user.id).all()
+            article_list = []
+
+            for article in articles:
+                article_object = {
+                    'id': article.id,
+                    'title': article.title,
+                    'body': article.body,
+                    'pub_at': article.pub_at,
+                    'user_id': int(user_id)
+                }
+
+                article_list.append(article_object)
+
+            response_object = {
+                'status': 'success',
+                'data': {
+                    'articles': article_list
+                }
+            }
+
+            return make_response(jsonify(response_object)), 200
+    except ValueError:
+        return make_response(jsonify(response_object)), 404
+
+
+
+
+
 
 
 
