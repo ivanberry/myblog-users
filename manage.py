@@ -5,7 +5,7 @@ import coverage
 
 from flask_script import Manager
 from project import create_app, db
-from project.api.models import User
+from project.api.models import User, Article
 
 COV = coverage.coverage(
     branch=True,
@@ -40,8 +40,12 @@ def recreate_db():
 @manager.command
 def seed_db():
     '''Seeds the database'''
-    db.session.add(User(username='tab', email='tab@gmail.com'))
-    db.session.add(User(username='shirting', email='shirting@gmail.com'))
+    user_tab = User(username='tabxx', email='tabxx@gmail.com')
+    user_shirting = User(username='shixrting', email='shirtixng@gmail.com')
+    db.session.add(user_tab)
+    db.session.add(user_shirting)
+    #db.session.add(Article(title='tabyy', body='Test', user_id=user_tab.id))
+    #db.session.add(Article(title='shrating', body='test article', user_id=user_shirting))
     db.session.commit()
 
 @manager.command

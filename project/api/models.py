@@ -10,7 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(128), nullable=False)
     active = db.Column(db.Boolean(), default=False, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
-    posts = db.relationship('Article', backref='article', lazy='dynamic')
+    articles = db.relationship('Article', backref='article', lazy='dynamic')
 
 
     def __init__(self, username, email, created_at=datetime.datetime.utcnow()):
@@ -29,7 +29,8 @@ class Article(db.Model):
     update_at = db.Column(db.DateTime, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    def __init__(self, title, body, pub_at=datetime.datetime.utcnow()):
+    def __init__(self, title, body, user_id, pub_at=datetime.datetime.utcnow()):
         self.title = title
         self.body = body
+        self.user_id = user_id
         self.pub_at = pub_at
