@@ -209,39 +209,26 @@ class TestArticlesService(BaseTestCase):
             self.assertIn('fail', data['status'])
             self.assertIn('Cant find such user', data['message'])
 
+    def test_add_articles(self):
+        '''Ensure add user with user id'''
+        user = add_user(username='tab', email='tab@gmail.com');
 
+        with self.client:
+            response = self.client.post(
+                '/articles',
+                data=json.dumps(dict(
+                    title='test',
+                    body='test content',
+                    user_id=user.id
+                )),
+                content_type='application/json'
+            )
 
+            data = json.loads(response.data.decode())
+            article = data['data']['articles'][0]
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('success', response.status)
+            self.assertEqual(article['user_id'], user.id)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            self.assertIn('test', article['title'])
+            self.assertIn('test content', article['body'])

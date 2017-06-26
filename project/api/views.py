@@ -135,7 +135,7 @@ def get_all_posts():
 
 @users_blueprint.route('/articles/<user_id>', methods=['GET'])
 def get_user_articles(user_id):
-    '''Get single user's articles'''
+    '''Get or Post user's articles'''
 
     response_object = {
         'status': 'fail',
@@ -173,13 +173,39 @@ def get_user_articles(user_id):
     except ValueError:
         return make_response(jsonify(response_object)), 404
 
+@users_blueprint.route('/articles', methods=['POST'])
+def add_single_user_articles():
+    post_data = request.get_json()
+    user_id = post_data.get('user_id')
+    user = User.query.filter_by(id=int(user_id)).first()
+    if not user:
+        response_object = {
+            'status': 'fail',
+            'message': 'The user did not exist'
+        }
+        return make_response(jsonify(response_object)), 404
+    else:
+        articles = Article.query.filter_by(id=int(user_id)).all()
+        articles_list = []
 
+        for article in articles:
+            article_object = {
+                'title': article.title,
+                'body': article.body,
+                'pubb_at': article.pub_at,
+                'user_id': article.user_id
+            }
 
+            articles_list.append(article_object)
 
+            response_object = {
+                'status': 'success',
+                'data': {
+                    'articles': articles_list
+                }
+            }
 
-
-
-
+        return make_response(jsonify(response_object)), 200
 
 
 
