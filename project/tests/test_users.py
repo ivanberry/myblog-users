@@ -225,10 +225,7 @@ class TestArticlesService(BaseTestCase):
             )
 
             data = json.loads(response.data.decode())
-            article = data['data']['articles'][0]
             self.assertEqual(response.status_code, 200)
-            self.assertIn('success', response.status)
-            self.assertEqual(article['user_id'], user.id)
+            self.assertIn('success', data['status'])
+            self.assertIn('The article has been added', data['message'])
 
-            self.assertIn('test', article['title'])
-            self.assertIn('test content', article['body'])

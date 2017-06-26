@@ -176,37 +176,22 @@ def get_user_articles(user_id):
 @users_blueprint.route('/articles', methods=['POST'])
 def add_single_user_articles():
     post_data = request.get_json()
+
     user_id = post_data.get('user_id')
+    title = post_data.get('title')
+    body = post_data.get('body')
+
     user = User.query.filter_by(id=int(user_id)).first()
-    if not user:
-        response_object = {
-            'status': 'fail',
-            'message': 'The user did not exist'
-        }
-        return make_response(jsonify(response_object)), 404
-    else:
-        articles = Article.query.filter_by(id=int(user_id)).all()
-        articles_list = []
 
-        for article in articles:
-            article_object = {
-                'title': article.title,
-                'body': article.body,
-                'pubb_at': article.pub_at,
-                'user_id': article.user_id
-            }
+    #确保不覆盖
+    articles = Article.query.filter_by(user_id=int(user_id)).all()
 
-            articles_list.append(article_object)
+    db.session.add(Article(title=title, body=body, user_id=user_id))
+    db.session.commit()
 
-            response_object = {
-                'status': 'success',
-                'data': {
-                    'articles': articles_list
-                }
-            }
+    response_object = {
+        'status': 'success',
+        'message': 'The article has been added'
+    }
 
-        return make_response(jsonify(response_object)), 200
-
-
-
-
+    return make_response(jsonify(response_object)), 200
