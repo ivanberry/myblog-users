@@ -229,3 +229,51 @@ class TestArticlesService(BaseTestCase):
             self.assertIn('success', data['status'])
             self.assertIn('The article has been added', data['message'])
 
+    def test_add_articles_no_user(self):
+        '''Ensure article added must be a user'''
+        with self.client:
+            response = self.client.post(
+                '/articles',
+                data=json.dumps(dict(
+                    title='test',
+                    body='test context',
+                    user_id=1
+                )),
+                content_type = 'application/json'
+            )
+
+        data = json.loads(response.data.decode())
+        self.assertEqual(404, response.status_code)
+        self.assertIn('fail', data['status'])
+        self.assertIn('The user did not exist', data['message'])
+
+    def test_add_articles_invalid_json(self):
+        '''Ensure invalid post data return correctly response'''
+        with self.client:
+            response = self.client.post(
+                '/articles',
+                data = json.dumps(dict()),
+                content_type='application/json'
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertEqual(400, response.status_code)
+            self.assertIn('fail', data['status'])
+            self.assertIn('invalid payload', data['message'])
+
+    def test_add_articles_invalid_key(self):
+        '''Ensure invalid key return correctly state'''
+        with self.client:
+            response = self.client.post(
+                '/articles',
+                data=json.dumps(dict(
+                    title='test title'
+                )),
+                content_type='application/json'
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertEqual(404, response.status_code)
+            self.assertIn('fail', data['status'])
+            self.assertIn('invalid user', data['message'])
+

@@ -177,21 +177,49 @@ def get_user_articles(user_id):
 def add_single_user_articles():
     post_data = request.get_json()
 
+    if not post_data:
+        response_object = {
+            'status': 'fail',
+            'message': 'invalid payload'
+        }
+
+        return make_response(jsonify(response_object)), 400
+
     user_id = post_data.get('user_id')
+
+    if not user_id:
+        response_object = {
+            'status': 'fail',
+            'message': 'invalid user'
+        }
+        return make_response(jsonify(response_object)), 404
+
     title = post_data.get('title')
     body = post_data.get('body')
 
-    user = User.query.filter_by(id=int(user_id)).first()
+    try:
+        user = User.query.filter_by(id=int(user_id)).first()
+        articles = Article.query.filter_by(user_id=int(user_id)).all()
+        if not user:
+            response_object = {
+                'status': 'fail',
+                'message': 'The user did not exist'
+            }
+            return make_response(jsonify(response_object)), 404
+        else:
+            db.session.add(Article(title=title, body=body, user_id=user_id))
+            db.session.commit()
 
-    #确保不覆盖
-    articles = Article.query.filter_by(user_id=int(user_id)).all()
+            response_object = {
+                'status': 'success',
+                'message': 'The article has been added'
+            }
 
-    db.session.add(Article(title=title, body=body, user_id=user_id))
-    db.session.commit()
-
-    response_object = {
-        'status': 'success',
-        'message': 'The article has been added'
-    }
-
-    return make_response(jsonify(response_object)), 200
+            return make_response(jsonify(response_object)), 200
+    except exc.IntegrityError as e:
+        db.session.rollback()
+        response_object = {
+            'status': 'fail',
+            'message': 'invalid payload'
+        }
+        return make_response(jsonify(response_object)), 400
