@@ -8,14 +8,16 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(128), nullable=False, unique=True)
     email = db.Column(db.String(128), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False)
     active = db.Column(db.String(255), nullable=False, default=True)
     created_at = db.Column(db.DateTime, nullable=False)
     articles = db.relationship('Article', backref='article', lazy='dynamic')
 
 
-    def __init__(self, username, email, created_at=datetime.datetime.utcnow()):
+    def __init__(self, username, email, password, created_at=datetime.datetime.utcnow()):
         self.username = username
         self.email = email
+        self.password = password
         self.created_at = created_at
 
 

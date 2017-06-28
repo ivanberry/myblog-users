@@ -1,16 +1,21 @@
 # project/__init__.py
+
 import os
 import datetime
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_migrate import Migrate
+from flask_bcrypt import Bcrypt
 
 # instantiate the db
 db = SQLAlchemy()
 
 # instantiate the migrate
 migrate = Migrate()
+
+# instantiate the bcrypt
+bcrypt = Bcrypt()
 
 def create_app():
 
@@ -26,6 +31,7 @@ def create_app():
 
     # set up extensions
     db.init_app(app)
+    bcrypt.init_app(app)
     migrate.init_app(app, db)
 
     # register blueprints

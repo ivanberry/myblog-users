@@ -4,13 +4,8 @@ import json
 from project.tests.base import BaseTestCase
 from project import db
 from project.api.models import User, Article
+from project.tests.ultis import add_user
 import datetime
-
-def add_user(username, email, created_at=datetime.datetime.now()):
-    user = User(username=username, email=email, created_at=created_at)
-    db.session.add(user)
-    db.session.commit()
-    return user
 
 def add_article(title, body, user_id, pub_at=datetime.datetime.utcnow()):
     article = Article(title=title, body=body, user_id=user_id, pub_at=pub_at)
@@ -37,7 +32,8 @@ class TestUsersService(BaseTestCase):
                 '/users',
                 data=json.dumps(dict(
                     username = 'tab',
-                    email='tab@gmail.com'
+                    email='tab@gmail.com',
+                    password='test'
                 )),
                 content_type='application/json'
             )
@@ -80,7 +76,8 @@ class TestUsersService(BaseTestCase):
                 '/users',
                 data=json.dumps(dict(
                     username='tab',
-                    email='tab@gmail.com'
+                    email='tab@gmail.com',
+                    password='test'
                 )),
                 content_type='application/json'
             )
@@ -90,7 +87,8 @@ class TestUsersService(BaseTestCase):
                 '/users',
                 data=json.dumps(dict(
                     username='shrint',
-                    email='tab@gmail.com'
+                    email='tab@gmail.com',
+                    password='test'
                 )),
                 content_type='application/json'
             )
@@ -105,7 +103,7 @@ class TestUsersService(BaseTestCase):
         '''Ensures get single user behaves correctly'''
 
         # add user first
-        user = add_user('tab', 'tab@gmail.com')
+        user = add_user('tab', 'tab@gmail.com', 'test')
 
         with self.client:
             response = self.client.get(f'/users/{user.id}')
@@ -137,8 +135,8 @@ class TestUsersService(BaseTestCase):
     def test_all_users(self):
         '''Ensure get all users behaviors correctly'''
         created = datetime.datetime.now() + datetime.timedelta(-30)
-        add_user('tab', 'tab@gmail.com', created)
-        add_user('shirting', 'shirting@gmail.com')
+        add_user('tab', 'tab@gmail.com', 'test',  created)
+        add_user('shirting', 'shirting@gmail.com', 'test')
         with self.client:
             response = self.client.get('/users')
             data = json.loads(response.data.decode())
@@ -156,8 +154,8 @@ class TestUsersService(BaseTestCase):
 class TestArticlesService(BaseTestCase):
     def test_all_articles(self):
         '''Ensure get all articles correctly'''
-        user_tab = add_user('tab', 'tab@gmail.com')
-        user_shirting = add_user('shirting', 'shirting@gmail.com')
+        user_tab = add_user('tab', 'tab@gmail.com', 'test')
+        user_shirting = add_user('shirting', 'shirting@gmail.com', 'test')
 
         add_article('test', 'This is a test content', user_tab.id)
         add_article('test2', 'This is a another test content', user_shirting.id)
@@ -186,7 +184,7 @@ class TestArticlesService(BaseTestCase):
         '''Ensure get user's articles correctly'''
 
         # add user's article first
-        user = add_user('tab', 'tab@gmail.com')
+        user = add_user('tab', 'tab@gmail.com', 'test')
 
         # get the users's id and as foreign key
         article = add_article('test', 'This is tab\' first article', user.id)
@@ -211,7 +209,7 @@ class TestArticlesService(BaseTestCase):
 
     def test_add_articles(self):
         '''Ensure add user with user id'''
-        user = add_user(username='tab', email='tab@gmail.com');
+        user = add_user(username='tab', email='tab@gmail.com', password='test');
 
         with self.client:
             response = self.client.post(

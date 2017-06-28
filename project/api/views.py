@@ -1,6 +1,6 @@
 # project/api/views.py
 
-from flask import Blueprint, jsonify, request, make_response, render_template
+from flask import Blueprint, jsonify, request, make_response
 from project.api.models import User, Article
 from project import db
 from sqlalchemy import exc
@@ -30,13 +30,14 @@ def add_user():
         return make_response(jsonify(response_object)), 400
     username = post_data.get('username')
     email = post_data.get('email')
+    password = post_data.get('password')
     try:
         # handler the duplicate email post
         user = User.query.filter_by(email=email).first()
 
         # not duplicate email
         if not user:
-            db.session.add(User(username=username, email=email))
+            db.session.add(User(username=username, email=email, password=password))
             db.session.commit()
 
             response_object = {
