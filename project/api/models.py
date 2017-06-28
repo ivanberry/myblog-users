@@ -14,6 +14,18 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     articles = db.relationship('Article', backref='article', lazy='dynamic')
 
+    @staticmethod
+    def decode_auth_token(auth_token):
+        '''Decode auth token'''
+        try:
+            payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return 'Signature expired. Please log in again'
+        except jwt.InvalidTokenError:
+            return 'Invalid token. Please log in again'
+
+
     def encode_auth_token(self, user_id):
         '''Generate user auth token'''
         try:
