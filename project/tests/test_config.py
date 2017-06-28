@@ -17,7 +17,7 @@ class TestDevelopmentConfig(TestCase):
         return app
 
     def test_app_is_development(self):
-        self.assertTrue(app.config['SECRET_KEY'] is 'weak_full_stack')
+        self.assertTrue(app.config['SECRET_KEY'] == os.environ.get('SECRET_KEY'))
         self.assertTrue(app.config['DEBUG'] is True)
         self.assertFalse(current_app is None)
         self.assertTrue(
@@ -33,7 +33,7 @@ class TestTestingConfig(TestCase):
         return app
 
     def test_app_is_testing(self):
-        self.assertTrue(app.config['SECRET_KEY'] is 'weak_full_stack')
+        self.assertTrue(app.config['SECRET_KEY'] == os.environ.get('SECRET_KEY'))
         self.assertTrue(app.config['DEBUG'])
         self.assertTrue(app.config['TESTING'])
         self.assertFalse(app.config['PRESERVE_CONTEXT_ON_EXCEPTION'])
@@ -51,7 +51,7 @@ class TestProductionConfig(TestCase):
         return app
 
     def test_app_is_production(self):
-        self.assertTrue(app.config['SECRET_KEY'] is 'weak_full_stack')
+        self.assertTrue(app.config['SECRET_KEY'] == os.environ.get('SECRET_KEY'))
         self.assertFalse(app.config['DEBUG'])
         self.assertFalse(app.config['TESTING'])
         self.assertTrue(app.config['BCRYPT_LOG_ROUNDS'] == 13)
