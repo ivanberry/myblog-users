@@ -4,6 +4,9 @@ FROM python:3.6.1
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+#set pip conf
+COPY ./pip.conf /etc/pip.conf
+
 # add requirments(to levarage Docker cache)
 ADD ./requirements.txt /usr/src/app/requirements.txt
 

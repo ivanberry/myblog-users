@@ -61,7 +61,7 @@ class TestUsersService(BaseTestCase):
         with self.client:
             response = self.client.post(
                 '/users',
-                data=json.dumps(dict(emai='tab@gmail.com')),
+                data=json.dumps(dict(email='tab@gmail.com')),
                 content_type='application/json'
             )
             data = json.loads(response.data.decode())
