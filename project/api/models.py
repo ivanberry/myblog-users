@@ -2,6 +2,7 @@
 
 import datetime
 import jwt
+from flask import current_app
 from project import db
 
 class User(db.Model):
@@ -13,6 +14,12 @@ class User(db.Model):
     active = db.Column(db.String(255), nullable=False, default=True)
     created_at = db.Column(db.DateTime, nullable=False)
     articles = db.relationship('Article', backref='article', lazy='dynamic')
+
+    def __init__(self, username, email, password, created_at=datetime.datetime.utcnow()):
+        self.username = username
+        self.email = email
+        self.password = password
+        self.created_at = created_at
 
     @staticmethod
     def decode_auth_token(auth_token):
@@ -43,15 +50,11 @@ class User(db.Model):
                     current_app.config.get('SECRET_KEY'),
                     algorithm='HS256'
             )
+
         except Exception as e:
-            return e;
+            return e
 
 
-    def __init__(self, username, email, password, created_at=datetime.datetime.utcnow()):
-        self.username = username
-        self.email = email
-        self.password = password
-        self.created_at = created_at
 
 
 class Article(db.Model):
