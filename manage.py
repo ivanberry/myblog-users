@@ -42,8 +42,8 @@ def recreate_db():
 @manager.command
 def seed_db():
     '''Seeds the database'''
-    user_tab = User(username='tabxx', email='tabxx@gmail.com', 'test')
-    user_shirting = User(username='shixrting', email='shirtixng@gmail.com', 'sss')
+    user_tab = User(username='tabxx', email='tabxx@gmail.com', password='test')
+    user_shirting = User(username='shixrting', email='shirtixng@gmail.com', password='sss')
     db.session.add(user_tab)
     db.session.add(user_shirting)
     #db.session.add(Article(title='tabyy', body='Test', user_id=user_tab.id))
