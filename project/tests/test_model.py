@@ -37,14 +37,19 @@ class TestUserModel(BaseTestCase):
         db.session.add(d_user)
         self.assertRaises(IntegrityError, db.session.commit)
 
-    def test_passwords_are_randow(self):
+    def test_passwords_are_random(self):
         user_one = add_user('test@test.com', 'test@gmail.com', 'test')
-        user_two = add_user('test@test2.com', 'test2@gmail.com', 'test21')
+        user_two = add_user('test@test2.com', 'test2@gmail.com', 'test')
         self.assertNotEqual(user_one.password, user_two.password)
 
     def test_encode_auth_token(self):
         user = add_user('test', 'tst@gmail.com', 'test')
         auth_token = user.encode_auth_token(user.id)
-        self.assertFalse(isinstance(auth_token, bytes))
-        self.assertTrue(User.decode_auth_token(auth_token), user.id)
+        self.assertTrue(isinstance(auth_token, bytes))
+
+    def test_decode_auth_token(self):
+        user = add_user('test', 'ts@gmail.com', 'test')
+        auth_token = user.encode_auth_token(user.id)
+        self.assertTrue(isinstance(auth_token, bytes))
+        self.assertTrue(User.decode_user_token(auth_token), user_id)
 
