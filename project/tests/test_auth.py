@@ -124,7 +124,7 @@ class TestAuthBlueprint(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue('error', data['status'])
-            self.assertTrue('Invalid payload.', data['message'])
+            self.assertIn('Invalid payload.', data['message'])
             self.assertTrue(response.status_code, 400)
 
 
