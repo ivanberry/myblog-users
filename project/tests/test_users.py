@@ -83,7 +83,7 @@ class TestUsersService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
-            self.assertIn('Invalid payload', data['message'])
+            self.assertIn('Invalid payload.', data['message'])
             self.assertIn('fail', data['status'])
 
 

@@ -59,6 +59,15 @@ def add_user():
         }
         return make_response(jsonify(response_object)), 400
 
+    except ValueError as e:
+        db.session.rollback()
+        response_object = {
+            'status': 'fail',
+            'message': 'Invalid payload.'
+        }
+
+        return make_response(jsonify(response_object)), 400
+
 
 @users_blueprint.route('/users/<user_id>', methods=['GET'])
 def get_single_user(user_id):
