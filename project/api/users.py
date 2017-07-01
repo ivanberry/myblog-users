@@ -1,11 +1,14 @@
 # project/api/views.py
 
+#framwork depes
 from flask import Blueprint, jsonify, request, make_response
-from project.api.models import User, Article
-from project import db
 from sqlalchemy import exc
 
-users_blueprint = Blueprint('users', __name__, template_folder='./templates')
+#project depes
+from project.api.models import User, Article
+from project import db
+
+users_blueprint = Blueprint('users', __name__)
 
 
 @users_blueprint.route('/ping', methods=['GET'])
