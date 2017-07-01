@@ -51,5 +51,5 @@ class TestUserModel(BaseTestCase):
         user = add_user('test', 'ts@gmail.com', 'test')
         auth_token = user.encode_auth_token(user.id)
         # self.assertTrue(isinstance(auth_token, bytes))
-        self.assertTrue(User.decode_user_token(auth_token), user_id)
+        self.assertTrue(User.decode_auth_token(auth_token), user.id)
 
