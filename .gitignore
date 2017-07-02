@@ -3,3 +3,4 @@ env
 .idea
 *.*.swp
 *.pyc
+htmlcov/
