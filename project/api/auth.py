@@ -4,11 +4,11 @@
 from flask import Blueprint, jsonify, request, make_response
 from sqlalchemy import exc, or_
 
-import pdb
-
 #project depes
 from project.api.models import User
 from project import db, bcrypt
+
+import pdb
 
 auth_blueprint = Blueprint('auth', __name__)
 
@@ -137,6 +137,34 @@ def logout_user():
             'message': 'Invalid token, Please log in again.'
         }
         return make_response(jsonify(response_object)), 401
+
+@auth_blueprint.route('/auth/status', methods=['GET'])
+def get_user_status():
+    user_header = request.headers.get('Authorization')
+    if user_header:
+        user_token = user_header.split(' ')[1] #Bearer authorization
+        resp = User.decode_auth_token(user_token) #get user id
+        if not isinstance(resp, str):
+            user = User.query.filter_by(id=resp).first()
+            response_object = {
+                'status': 'success',
+                'data': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'active': user.active,
+                    'created_at': user.created_at
+                }
+            }
+
+            return make_response(jsonify(response_object)), 200
+        else:
+            response_object = {
+                'status': 'error',
+                'message': 'Invalid token. Please log in again.'
+            }
+            return make_response(jsonify(response_object)), 401
+
 
 
 
