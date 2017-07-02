@@ -20,7 +20,7 @@ class User(db.Model):
         self.email = email
         self.password = bcrypt.generate_password_hash(
                 password, current_app.config.get('BCRYPT_LOG_ROUNDS')
-        )
+        ).decode('utf-8')
         self.created_at = created_at
 
     @staticmethod
