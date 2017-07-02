@@ -127,6 +127,53 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertIn('Invalid payload.', data['message'])
             self.assertTrue(response.status_code, 400)
 
+    def test_registered_user_login(self):
+        with self.client:
+            user = add_user(username='test', email='tese@gmail.com', password='test')
+            response = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(
+                    email='tese@gmail.com',
+                    password='test'
+                )),
+                content_type='application/json'
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'], 'success')
+            self.assertTrue(data['message'], 'Login success!')
+            self.assertTrue(response.status_code, 200)
+
+    def test_not_registered_user_login(self):
+        with self.client:
+            response = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(
+                    email='test@gmail.com',
+                    password='test'
+                )),
+                content_type='application/json'
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'], 'error')
+            self.assertTrue(data['message'], 'User does not exsit.')
+            self.assertTrue(response.status_code, 400)
+
+    def test_invalid_user_login(self):
+        with self.client:
+            response = self.clent.post(
+                '/auth/login',
+                data = json.dumps(dict()),
+                content_type = 'application/json'
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'], 'error')
+            self.assertTrue(data['message'], 'Invalid payload.')
+            self.assertTrue(response.status_code, 400)
+
+
 
 
 

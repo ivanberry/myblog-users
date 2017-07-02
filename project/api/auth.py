@@ -68,6 +68,43 @@ def register_user():
         }
         return make_response(jsonify(response_object)), 400
 
+@auth_blueprint.route('/auth/login', methods=['POST'])
+def login_user():
+    #get post data
+    post_data = request.get_json()
+    if not post_data:
+        response_object = {
+            'status': 'error',
+            'message': 'Invalid payload'
+        }
+        return make_response(jsonify(response_object)), 400
+    email = post_data.get('email')
+    password = post_data.get('password')
+    try:
+        #fetch data from db
+        user = User.query.filter_by(email=email).first()
+        if user and bcrypt.check_password_hash(user.password, password):
+            response_object = {
+                'status': 'success',
+                'message': 'Login success!'
+            }
+            return make_response(jsonify(response_object)), 200
+        else:
+            response_object = {
+                'status': 'error',
+                'message': 'User does not exsit.'
+            }
+
+            return make_response(jsonify(response_object)), 404
+    except Exception as e:
+        print(e)
+        response_object = {
+            'status': 'error',
+            'message': 'Try again'
+        }
+        return make_response(jsonify(response_object)), 500
+
+
 
 
 
