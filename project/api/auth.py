@@ -4,6 +4,8 @@
 from flask import Blueprint, jsonify, request, make_response
 from sqlalchemy import exc, or_
 
+import pdb
+
 #project depes
 from project.api.models import User
 from project import db, bcrypt
@@ -75,20 +77,24 @@ def login_user():
     if not post_data:
         response_object = {
             'status': 'error',
-            'message': 'Invalid payload'
+            'message': 'Invalid payload.'
         }
         return make_response(jsonify(response_object)), 400
     email = post_data.get('email')
     password = post_data.get('password')
+
     try:
         #fetch data from db
         user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            response_object = {
-                'status': 'success',
-                'message': 'Login success!'
-            }
-            return make_response(jsonify(response_object)), 200
+            user_token = user.encode_auth_token(user.id)
+            if user_token:
+                response_object = {
+                    'status': 'success',
+                    'message': 'Login success!',
+                    'user_token': user_token.decode()
+                }
+                return make_response(jsonify(response_object)), 200
         else:
             response_object = {
                 'status': 'error',
@@ -103,6 +109,34 @@ def login_user():
             'message': 'Try again'
         }
         return make_response(jsonify(response_object)), 500
+
+@auth_blueprint.route('/auth/logout', methods=['GET'])
+def logout_user():
+    #get requset header
+    user_header = request.headers.get('Authorization')
+    if user_header:
+        user_token = user_header.split(' ')[1]
+        resp = User.decode_auth_token(user_token)
+        if not isinstance(resp, str):
+            response_object = {
+                'status': 'success',
+                'message': 'Successfully logged out.'
+            }
+
+            return make_response(jsonify(response_object)), 200
+        else:
+            response_object = {
+                'status': 'error',
+                'message': resp
+            }
+            return make_response(jsonify(response_object)), 401
+
+    else:
+        response_object = {
+            'status': 'error',
+            'message': 'Invalid token, Please log in again.'
+        }
+        return make_response(jsonify(response_object)), 401
 
 
 

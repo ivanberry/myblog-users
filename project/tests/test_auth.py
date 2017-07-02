@@ -1,6 +1,7 @@
 #project/test/test_auth.py
 
 import json
+import time
 
 from project import db
 from project.api.models import User
@@ -129,19 +130,20 @@ class TestAuthBlueprint(BaseTestCase):
 
     def test_registered_user_login(self):
         with self.client:
-            user = add_user(username='test', email='tese@gmail.com', password='test')
+            user = add_user('test', 'test@gmail.com', 'test')
             response = self.client.post(
                 '/auth/login',
                 data=json.dumps(dict(
-                    email='tese@gmail.com',
+                    email='test@gmail.com',
                     password='test'
                 )),
                 content_type='application/json'
             )
 
             data = json.loads(response.data.decode())
-            self.assertTrue(data['status'], 'success')
-            self.assertTrue(data['message'], 'Login success!')
+            self.assertTrue(data['status'] == 'success')
+            self.assertTrue(data['message'] == 'Login success!')
+            self.assertTrue(data['user_token'])
             self.assertTrue(response.status_code, 200)
 
     def test_not_registered_user_login(self):
@@ -156,22 +158,95 @@ class TestAuthBlueprint(BaseTestCase):
             )
 
             data = json.loads(response.data.decode())
-            self.assertTrue(data['status'], 'error')
-            self.assertTrue(data['message'], 'User does not exsit.')
+            self.assertTrue(data['status'] == 'error')
+            self.assertTrue(data['message'] == 'User does not exsit.')
             self.assertTrue(response.status_code, 400)
 
     def test_invalid_user_login(self):
         with self.client:
-            response = self.clent.post(
+            response = self.client.post(
                 '/auth/login',
                 data = json.dumps(dict()),
                 content_type = 'application/json'
             )
 
             data = json.loads(response.data.decode())
-            self.assertTrue(data['status'], 'error')
-            self.assertTrue(data['message'], 'Invalid payload.')
+            self.assertTrue(data['status'] == 'error')
+            self.assertTrue(data['message'] == 'Invalid payload.')
             self.assertTrue(response.status_code, 400)
+
+    def test_valid_logout(self):
+        add_user('test', 'test@gmail.com', 'test')
+        with self.client:
+            #user login response
+            resp_login = self.client.post(
+                '/auth/login',
+                data = json.dumps(dict(
+                    email='test@gmail.com',
+                    password='test'
+                )),
+                content_type = 'application/json'
+            )
+
+            #valid logout response
+            response = self.client.get(
+                '/auth/logout',
+                headers=dict(
+                    Authorization='Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['user_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'success')
+            self.assertTrue(data['message'] == 'Successfully logged out.')
+            self.assertEqual(response.status_code, 200)
+
+    def test_invalid_logout_expired_token(self):
+        add_user('test', 'test@gmail.com', 'test')
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data = json.dumps(dict(
+                    email='test@gmail.com',
+                    password='test'
+                )),
+                content_type='application/json'
+            )
+
+            # user invalid logout
+            time.sleep(4)
+            response = self.client.get(
+                '/auth/logout',
+                headers=dict(
+                    Authorization='Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['user_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'error')
+            self.assertTrue(data['message'] == 'Signature expired. Please log in again')
+            self.assertEqual(response.status_code, 401)
+
+    def test_invalid_logout(self):
+        with self.client:
+            response = self.client.get(
+                '/auth/logout',
+                headers=dict(
+                    Authrization='Bearer invalid'
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertEqual(401, response.status_code)
+            self.assertTrue(data['status'] == 'error')
+            self.assertTrue(data['message'] == 'Invalid token, Please log in again.')
+
+
+
 
 
 
