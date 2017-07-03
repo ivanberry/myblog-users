@@ -92,7 +92,7 @@ def login_user():
                 response_object = {
                     'status': 'success',
                     'message': 'Login success!',
-                    'user_token': user_token.decode()
+                    'auth_token': user_token.decode()
                 }
                 return make_response(jsonify(response_object)), 200
         else:

@@ -143,7 +143,7 @@ class TestAuthBlueprint(BaseTestCase):
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['message'] == 'Login success!')
-            self.assertTrue(data['user_token'])
+            self.assertTrue(data['auth_token'])
             self.assertTrue(response.status_code, 200)
 
     def test_not_registered_user_login(self):
@@ -194,7 +194,7 @@ class TestAuthBlueprint(BaseTestCase):
                 headers=dict(
                     Authorization='Bearer ' + json.loads(
                         resp_login.data.decode()
-                    )['user_token']
+                    )['auth_token']
                 )
             )
 
@@ -222,7 +222,7 @@ class TestAuthBlueprint(BaseTestCase):
                 headers=dict(
                     Authorization='Bearer ' + json.loads(
                         resp_login.data.decode()
-                    )['user_token']
+                    )['auth_token']
                 )
             )
 
@@ -260,7 +260,7 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.get(
                 '/auth/status',
                 headers=dict(
-                    Authorization='Bearer ' + json.loads(resp_login.data.decode())['user_token']
+                    Authorization='Bearer ' + json.loads(resp_login.data.decode())['auth_token']
                 )
             )
             data = json.loads(response.data.decode())
