@@ -11,7 +11,7 @@ class User(db.Model):
     username = db.Column(db.String(128), nullable=False, unique=True)
     email = db.Column(db.String(128), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
-    active = db.Column(db.Boolean(), nullable=False, default=True)
+    active = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(db.DateTime, nullable=False)
     articles = db.relationship('Article', backref='article', lazy='dynamic')
 
