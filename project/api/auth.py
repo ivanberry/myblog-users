@@ -118,12 +118,21 @@ def logout_user():
         user_token = user_header.split(' ')[1]
         resp = User.decode_auth_token(user_token)
         if not isinstance(resp, str):
-            response_object = {
-                'status': 'success',
-                'message': 'Successfully logged out.'
-            }
+            user = User.query.filter_by(id=resp).first()
+            if not user or not user.active:
+                response_object = {
+                    'status': 'error',
+                    'message': 'Something went wrong. Please contact us.'
+                }
+                return make_response(jsonify(response_object)), 401
+            else:
 
-            return make_response(jsonify(response_object)), 200
+                response_object = {
+                    'status': 'success',
+                    'message': 'Successfully logged out.'
+                }
+
+                return make_response(jsonify(response_object)), 200
         else:
             response_object = {
                 'status': 'error',
@@ -136,7 +145,7 @@ def logout_user():
             'status': 'error',
             'message': 'Invalid token, Please log in again.'
         }
-        return make_response(jsonify(response_object)), 401
+        return make_response(jsonify(response_object)), 403
 
 @auth_blueprint.route('/auth/status', methods=['GET'])
 def get_user_status():

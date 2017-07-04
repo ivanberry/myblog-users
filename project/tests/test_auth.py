@@ -241,7 +241,7 @@ class TestAuthBlueprint(BaseTestCase):
             )
 
             data = json.loads(response.data.decode())
-            self.assertEqual(401, response.status_code)
+            self.assertEqual(403, response.status_code)
             self.assertTrue(data['status'] == 'error')
             self.assertTrue(data['message'] == 'Invalid token, Please log in again.')
 
@@ -268,7 +268,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data['data'] is not None)
             self.assertTrue(data['data']['username'] == 'test')
             self.assertTrue(data['data']['email'] == 'test@gmail.com')
-            self.assertTrue(data['data']['active'] == 'true')
+            self.assertTrue(data['data']['active'] == True)
             self.assertTrue(data['data']['created_at'])
             self.assertEqual(response.status_code, 200)
 
@@ -286,6 +286,36 @@ class TestAuthBlueprint(BaseTestCase):
                 data['message'] == 'Invalid token. Please log in again.'
             )
             self.assertEqual(response.status_code, 401)
+
+    def test_invalid_logout_inactive(self):
+        add_user('test', 'test@gmail.com', 'test')
+        #update_user
+        user = User.query.filter_by(email='test@gmail.com').first()
+        user.active = False
+        db.session.commit()
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data = json.dumps(dict(
+                    email='test@gmail.com',
+                    password='test'
+                )),
+                content_type = 'application/json'
+            )
+
+            response = self.client.get(
+                '/auth/logout',
+                headers = dict(
+                    Authorization='Bearer ' + json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'error')
+            self.assertTrue(data['message'] == 'Something went wrong. Please contact us.')
+            self.assertEqual(response.status_code, 401)
+
+
 
 
 
