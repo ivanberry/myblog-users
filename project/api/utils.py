@@ -9,6 +9,7 @@ import pdb
 def authenticate(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # pdb.set_trace()
         response_object = {
             'status': 'error',
             'message': 'Something went wrong. Please contact us.'
