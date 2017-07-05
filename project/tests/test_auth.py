@@ -236,14 +236,14 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.get(
                 '/auth/logout',
                 headers=dict(
-                    Authrization='Bearer invalid'
+                    Authorization='Bearer invalid'
                 )
             )
 
             data = json.loads(response.data.decode())
-            self.assertEqual(403, response.status_code)
+            self.assertEqual(401, response.status_code)
             self.assertTrue(data['status'] == 'error')
-            self.assertTrue(data['message'] == 'Invalid token, Please log in again.')
+            self.assertTrue(data['message'] == 'Invalid token. Please log in again')
 
     def test_user_status(self):
         add_user('test', 'test@gmail.com', 'test')
@@ -306,7 +306,9 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.get(
                 '/auth/logout',
                 headers = dict(
-                    Authorization='Bearer ' + json.loads(resp_login.data.decode())['auth_token']
+                    Authorization='Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
                 )
             )
 

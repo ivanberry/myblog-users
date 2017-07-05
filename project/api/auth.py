@@ -7,6 +7,7 @@ from sqlalchemy import exc, or_
 #project depes
 from project.api.models import User
 from project import db, bcrypt
+from project.api.utils import authenticate
 
 import pdb
 
@@ -111,41 +112,14 @@ def login_user():
         return make_response(jsonify(response_object)), 500
 
 @auth_blueprint.route('/auth/logout', methods=['GET'])
-def logout_user():
-    #get requset header
-    user_header = request.headers.get('Authorization')
-    if user_header:
-        user_token = user_header.split(' ')[1]
-        resp = User.decode_auth_token(user_token)
-        if not isinstance(resp, str):
-            user = User.query.filter_by(id=resp).first()
-            if not user or not user.active:
-                response_object = {
-                    'status': 'error',
-                    'message': 'Something went wrong. Please contact us.'
-                }
-                return make_response(jsonify(response_object)), 401
-            else:
+@authenticate
+def logout_user(resp):
+    response_object = {
+        'status': 'success',
+        'message': 'Successfully logged out.'
+    }
 
-                response_object = {
-                    'status': 'success',
-                    'message': 'Successfully logged out.'
-                }
-
-                return make_response(jsonify(response_object)), 200
-        else:
-            response_object = {
-                'status': 'error',
-                'message': resp
-            }
-            return make_response(jsonify(response_object)), 401
-
-    else:
-        response_object = {
-            'status': 'error',
-            'message': 'Invalid token, Please log in again.'
-        }
-        return make_response(jsonify(response_object)), 403
+    return make_response(jsonify(response_object)), 200
 
 @auth_blueprint.route('/auth/status', methods=['GET'])
 def get_user_status():
