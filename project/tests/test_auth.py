@@ -283,7 +283,7 @@ class TestAuthBlueprint(BaseTestCase):
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'error')
             self.assertTrue(
-                data['message'] == 'Invalid token. Please log in again.'
+                data['message'] == 'Invalid token. Please log in again'
             )
             self.assertEqual(response.status_code, 401)
 

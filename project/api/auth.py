@@ -122,33 +122,21 @@ def logout_user(resp):
     return make_response(jsonify(response_object)), 200
 
 @auth_blueprint.route('/auth/status', methods=['GET'])
-def get_user_status():
-    user_header = request.headers.get('Authorization')
-    if user_header:
-        user_token = user_header.split(' ')[1] #Bearer authorization
-        resp = User.decode_auth_token(user_token) #get user id
-        if not isinstance(resp, str):
-            user = User.query.filter_by(id=resp).first()
-            response_object = {
-                'status': 'success',
-                'data': {
-                    'id': user.id,
-                    'username': user.username,
-                    'email': user.email,
-                    'active': user.active,
-                    'created_at': user.created_at
-                }
-            }
+@authenticate
+def get_user_status(resp):
+    user = User.query.filter_by(id=resp).first()
+    response_object = {
+        'status': 'success',
+        'data': {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'active': user.active,
+            'created_at': user.created_at
+        }
+    }
 
-            return make_response(jsonify(response_object)), 200
-        else:
-            response_object = {
-                'status': 'error',
-                'message': 'Invalid token. Please log in again.'
-            }
-            return make_response(jsonify(response_object)), 401
-
-
+    return make_response(jsonify(response_object)), 200
 
 
 
