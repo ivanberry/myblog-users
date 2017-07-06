@@ -28,7 +28,16 @@ class TestUsersService(BaseTestCase):
     def test_add_user(self):
         '''Ensure a new user can be added to the database'''
 
-        add_user('test', 'test@gmail.com', 'test')
+        user = add_user('test', 'test@gmail.com', 'test')
+
+        self.assertTrue(user.id)
+        self.assertTrue(user.email, 'test@gmail.com')
+        self.assertTrue(user.username, 'test')
+        self.assertTrue(user.password)
+        self.assertTrue(user.active)
+        self.assertTrue(user.created_at)
+        self.assertTrue(user.admin == False)
+
 
         resp_login = self.client.post(
             '/auth/login',
