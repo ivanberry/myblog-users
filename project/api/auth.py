@@ -75,6 +75,7 @@ def register_user():
 def login_user():
     #get post data
     post_data = request.get_json()
+    # pdb.set_trace()
     if not post_data:
         response_object = {
             'status': 'error',

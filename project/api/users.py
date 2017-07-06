@@ -7,6 +7,9 @@ from sqlalchemy import exc
 #project depes
 from project.api.models import User, Article
 from project import db
+from project.api.utils import authenticate
+
+import pdb
 
 users_blueprint = Blueprint('users', __name__)
 
@@ -20,7 +23,9 @@ def ping_pong():
 
 
 @users_blueprint.route('/users', methods=['POST'])
-def add_user():
+@authenticate
+def add_user(resp):
+    # pdb.set_trace()
     post_data = request.get_json()
     # handler the empty post
     if not post_data:
@@ -34,6 +39,7 @@ def add_user():
     username = post_data.get('username')
     email = post_data.get('email')
     password = post_data.get('password')
+
     try:
         # handler the duplicate email post
         user = User.query.filter_by(email=email).first()

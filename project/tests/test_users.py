@@ -6,6 +6,7 @@ from project import db
 from project.api.models import User, Article
 from project.tests.ultis import add_user
 import datetime
+import pdb
 
 def add_article(title, body, user_id, pub_at=datetime.datetime.utcnow()):
     article = Article(title=title, body=body, user_id=user_id, pub_at=pub_at)
@@ -27,6 +28,17 @@ class TestUsersService(BaseTestCase):
     def test_add_user(self):
         '''Ensure a new user can be added to the database'''
 
+        add_user('test', 'test@gmail.com', 'test')
+
+        resp_login = self.client.post(
+            '/auth/login',
+            data=json.dumps(dict(
+                email='test@gmail.com',
+                password='test'
+            )),
+            content_type='application/json'
+        )
+
         with self.client:
             response = self.client.post(
                 '/users',
@@ -35,7 +47,12 @@ class TestUsersService(BaseTestCase):
                     email='tab@gmail.com',
                     password='test'
                 )),
-                content_type='application/json'
+                content_type='application/json',
+                headers=dict(
+                    Authorization = 'Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
             )
 
             data = json.loads(response.data.decode())
@@ -45,11 +62,26 @@ class TestUsersService(BaseTestCase):
 
     def test_add_user_invalid_json(self):
         '''Ensure error is thrown if the JSON object is empty'''
+        add_user('test', 'test@gmail.com', 'test')
+        resp_login = self.client.post(
+            '/auth/login',
+            data=json.dumps(dict(
+                email='test@gmail.com',
+                password='test'
+            )),
+            content_type='application/json'
+        )
+
         with self.client:
             response = self.client.post(
                 '/users',
                 data=json.dumps(dict()),
-                content_type='application/json'
+                content_type='application/json',
+                headers=dict(
+                    Authorization = 'Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -58,11 +90,26 @@ class TestUsersService(BaseTestCase):
 
     def test_add_user_invalid_json_keys(self):
         '''Ensure error is thrown if the JSON object does not have username key'''
+        add_user('test', 'test@gmail.com', 'test')
+        resp_login = self.client.post(
+            '/auth/login',
+            data=json.dumps(dict(
+                email='test@gmail.com',
+                password='test'
+            )),
+            content_type='application/json'
+        )
+
         with self.client:
             response = self.client.post(
                 '/users',
                 data=json.dumps(dict(email='tab@gmail.com')),
-                content_type='application/json'
+                content_type='application/json',
+                headers=dict(
+                    Authorization = 'Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -71,15 +118,31 @@ class TestUsersService(BaseTestCase):
 
     def test_add_user_invalid_json_keys_no_password(self):
         '''Ensure password provided'''
+        add_user('test', 'test@gmail.com', 'test')
+        resp_login = self.client.post(
+            '/auth/login',
+            data=json.dumps(dict(
+                email='test@gmail.com',
+                password='test'
+            )),
+            content_type='application/json'
+        )
+
         with self.client:
             response = self.client.post(
-                    '/users',
-                    data=json.dumps(dict(
-                        username='test',
-                        email='tess@gmail.com'
-                    )),
-                    content_type='application/json'
-             )
+                '/users',
+                data=json.dumps(dict(
+                    username='test',
+                    email='tess@gmail.com'
+                )),
+                content_type='application/json',
+                headers=dict(
+                    Authorization = 'Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
+
+            )
 
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -89,6 +152,16 @@ class TestUsersService(BaseTestCase):
 
     def test_add_user_duplicate_user(self):
         '''Ensure error is thrown if the email already exits.'''
+        add_user('test', 'test@gmail.com', 'test')
+        resp_login = self.client.post(
+            '/auth/login',
+            data=json.dumps(dict(
+                email='test@gmail.com',
+                password='test'
+            )),
+            content_type='application/json'
+        )
+
         with self.client:
             self.client.post(
                 '/users',
@@ -97,7 +170,12 @@ class TestUsersService(BaseTestCase):
                     email='tab@gmail.com',
                     password='test'
                 )),
-                content_type='application/json'
+                content_type='application/json',
+                headers=dict(
+                    Authorization = 'Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
             )
 
             # 模拟post请求，绑定'users'接口返回的数据
@@ -108,7 +186,12 @@ class TestUsersService(BaseTestCase):
                     email='tab@gmail.com',
                     password='test'
                 )),
-                content_type='application/json'
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
             )
 
             # 解码返回的数据
@@ -167,6 +250,42 @@ class TestUsersService(BaseTestCase):
             self.assertIn('shirting', data['data']['users'][0]['username'])
             self.assertIn('shirting@gmail.com', data['data']['users'][0]['email'])
             self.assertIn('success', data['status'])
+
+    def test_add_user_inactive(self):
+        add_user('test', 'test@gmail.com', 'test')
+        user = User.query.filter_by(email='test@gmail.com').first()
+
+        #set user active to False
+        user.active = False
+        db.session.commit()
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data = json.dumps(dict(
+                    email='test@gmail.com',
+                    password='test'
+                )),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/users',
+                data=json.dumps(dict(
+                    email='tab@gmail.com',
+                    password='test'
+                )),
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
+            )
+
+        data = json.loads(response.data.decode())
+        self.assertTrue(data['status'] == 'error')
+        self.assertTrue(data['message'] == 'Something went wrong. Please contact us.')
+        self.assertTrue(response.status_code, 401)
 
 
 class TestArticlesService(BaseTestCase):
