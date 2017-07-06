@@ -12,6 +12,7 @@ class User(db.Model):
     email = db.Column(db.String(128), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    admin = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False)
     articles = db.relationship('Article', backref='article', lazy='dynamic')
 
