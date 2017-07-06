@@ -30,6 +30,7 @@ class TestUsersService(BaseTestCase):
 
         user = add_user('test', 'test@gmail.com', 'test')
 
+
         self.assertTrue(user.id)
         self.assertTrue(user.email, 'test@gmail.com')
         self.assertTrue(user.username, 'test')
@@ -38,6 +39,9 @@ class TestUsersService(BaseTestCase):
         self.assertTrue(user.created_at)
         self.assertTrue(user.admin == False)
 
+        test_user = User.query.filter_by(email='test@gmail.com').first()
+        test_user.admin = True;
+        db.session.commit()
 
         resp_login = self.client.post(
             '/auth/login',
@@ -72,6 +76,11 @@ class TestUsersService(BaseTestCase):
     def test_add_user_invalid_json(self):
         '''Ensure error is thrown if the JSON object is empty'''
         add_user('test', 'test@gmail.com', 'test')
+
+        user = User.query.filter_by(email='test@gmail.com').first()
+        user.admin=True
+        db.session.commit()
+
         resp_login = self.client.post(
             '/auth/login',
             data=json.dumps(dict(
@@ -100,6 +109,10 @@ class TestUsersService(BaseTestCase):
     def test_add_user_invalid_json_keys(self):
         '''Ensure error is thrown if the JSON object does not have username key'''
         add_user('test', 'test@gmail.com', 'test')
+        user = User.query.filter_by(email='test@gmail.com').first()
+        user.admin=True
+        db.session.commit()
+
         resp_login = self.client.post(
             '/auth/login',
             data=json.dumps(dict(
@@ -128,6 +141,10 @@ class TestUsersService(BaseTestCase):
     def test_add_user_invalid_json_keys_no_password(self):
         '''Ensure password provided'''
         add_user('test', 'test@gmail.com', 'test')
+        user = User.query.filter_by(email='test@gmail.com').first()
+        user.admin = True
+        db.session.commit()
+
         resp_login = self.client.post(
             '/auth/login',
             data=json.dumps(dict(
@@ -161,6 +178,10 @@ class TestUsersService(BaseTestCase):
     def test_add_user_duplicate_user(self):
         '''Ensure error is thrown if the email already exits.'''
         add_user('test', 'test@gmail.com', 'test')
+        user = User.query.filter_by(email='test@gmail.com').first()
+        user.admin=True
+        db.session.commit()
+
         resp_login = self.client.post(
             '/auth/login',
             data=json.dumps(dict(
@@ -190,7 +211,7 @@ class TestUsersService(BaseTestCase):
             response = self.client.post(
                 '/users',
                 data=json.dumps(dict(
-                    username='shrint',
+                    username='tab',
                     email='tab@gmail.com',
                     password='test'
                 )),
@@ -210,6 +231,8 @@ class TestUsersService(BaseTestCase):
 
     def test_add_user_not_admin(self):
         add_user('test', 'test@gmail.com', 'test')
+        user = User.query.filter_by(email='test@gmail.com').first()
+        db.session.commit()
 
         #user_login
         resp_login = self.client.post(

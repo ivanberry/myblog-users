@@ -7,7 +7,7 @@ from sqlalchemy import exc
 #project depes
 from project.api.models import User, Article
 from project import db
-from project.api.utils import authenticate
+from project.api.utils import authenticate, is_admin
 
 import pdb
 
@@ -26,6 +26,12 @@ def ping_pong():
 @authenticate
 def add_user(resp):
     # pdb.set_trace()
+    if not is_admin(resp):
+        response_object = {
+            'status': 'error',
+            'message': 'You do not have permission to do that.'
+        }
+        return make_response(jsonify(response_object)), 401
     post_data = request.get_json()
     # handler the empty post
     if not post_data:
