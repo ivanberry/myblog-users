@@ -158,7 +158,6 @@ class TestUsersService(BaseTestCase):
             self.assertIn('Invalid payload.', data['message'])
             self.assertIn('fail', data['status'])
 
-
     def test_add_user_duplicate_user(self):
         '''Ensure error is thrown if the email already exits.'''
         add_user('test', 'test@gmail.com', 'test')
@@ -208,6 +207,42 @@ class TestUsersService(BaseTestCase):
             self.assertEqual(response.status_code, 400)
             self.assertIn('Sorry, That email has already exist.', data['message'])
             self.assertIn('fail', data['status'])
+
+    def test_add_user_not_admin(self):
+        add_user('test', 'test@gmail.com', 'test')
+
+        #user_login
+        resp_login = self.client.post(
+            '/auth/login',
+            data = json.dumps(dict(
+                email='test@gmail.com',
+                password='test'
+            )),
+            content_type='application/json'
+        )
+
+        #add_user
+        with self.client:
+            response = self.client.post(
+                '/users',
+                data = json.dumps(dict(
+                    username='ta',
+                    email='tst@gmail.com',
+                    password='test'
+                )),
+                content_type='application/json',
+                headers = dict(
+                    Authorization= 'Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(response.status_code, 401)
+            self.assertTrue(data['status'] == 'error')
+            self.assertTrue(data['message'] == 'You do not have permission to do that.')
+
 
     def test_single_user(self):
         '''Ensures get single user behaves correctly'''
