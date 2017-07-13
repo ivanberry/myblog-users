@@ -8,7 +8,7 @@ from project.tests.ultis import add_user
 import datetime
 import pdb
 
-def add_article(title, body, user_id, pub_at=datetime.datetime.utcnow()):
+def add_article(title, body, user_id, pub_at=datetime.datetime.now()):
     article = Article(title=title, body=body, user_id=user_id, pub_at=pub_at)
     db.session.add(article)
     db.session.commit()

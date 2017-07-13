@@ -11,6 +11,8 @@ class BaseConfig:
     BCRYPT_LOG_ROUNDS = 13
     TOKEN_EXPIRATION_DAYS = 30
     TOKEN_EXPIRATION_SECONDS = 0
+    QINIU_ACCESS_KEY = 'FyG9hqVJz1p8EEinxZ95gESWd63kv4RMxBRrcleC'
+    QINIU_SECRET_KEY = os.environ.get('QINIU_SECRET_KEY')
 
 class DevelopmentConfig(BaseConfig):
     '''Development configuration'''

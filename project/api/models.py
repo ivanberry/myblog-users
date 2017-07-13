@@ -16,7 +16,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     articles = db.relationship('Article', backref='article', lazy='dynamic')
 
-    def __init__(self, username, email, password, created_at=datetime.datetime.utcnow()):
+    def __init__(self, username, email, password, created_at=datetime.datetime.now()):
         self.username = username
         self.email = email
         self.password = bcrypt.generate_password_hash(
@@ -25,11 +25,16 @@ class User(db.Model):
         self.created_at = created_at
 
     @staticmethod
-    def decode_auth_token(auth_token):
+    def decode_auth_token(auth_token, *args):
         '''Decode auth token'''
+        if (len(args)):
+            key = args
+        else:
+            key = 'sub'
+
         try:
             payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
-            return payload['sub']
+            return payload[key]
         except jwt.ExpiredSignatureError:
             return 'Signature expired. Please log in again'
         except jwt.InvalidTokenError:
@@ -44,7 +49,7 @@ class User(db.Model):
                     days=current_app.config.get('TOKEN_EXPIRATION_DAYS'),
                     seconds=current_app.config.get('TOKEN_EXPIRATION_SECONDS')
                 ),
-                'iat': datetime.datetime.utcnow(),
+                'iat': datetime.datetime.now(),
                 'sub': user_id
             }
 
@@ -72,7 +77,7 @@ class Article(db.Model):
     update_at = db.Column(db.DateTime, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    def __init__(self, title, body, user_id, pub_at=datetime.datetime.utcnow()):
+    def __init__(self, title, body, user_id, pub_at=datetime.datetime.now()):
         self.title = title
         self.body = body
         self.user_id = user_id
