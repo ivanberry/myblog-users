@@ -317,6 +317,37 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data['message'] == 'Something went wrong. Please contact us.')
             self.assertEqual(response.status_code, 401)
 
+    def test_upload_token(self):
+        '''Ensure get token correctly'''
+        add_user('test', 'test@gmail.com', 'test')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data = json.dumps(dict(
+                    email='test@gmail.com',
+                    password='test'
+                )),
+                content_type = 'application/json'
+            )
+
+            response = self.client.get(
+                '/auth/qiniu',
+                headers = dict(
+                    Authorization='Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(response.status_code, 200)
+            self.assertTrue(data['status'], 'success')
+            self.assertTrue(data['q_token'])
+
+
+
+
 
 
 

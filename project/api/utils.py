@@ -12,7 +12,6 @@ import pdb
 def authenticate(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # pdb.set_trace()
         response_object = {
             'status': 'error',
             'message': 'Something went wrong. Please contact us.'
@@ -42,7 +41,6 @@ def get_upload_token(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
 
-        # pdb.set_trace()
         ak = 'FyG9hqVJz1p8EEinxZ95gESWd63kv4RMxBRrcleC'
         sk = os.environ.get('QINIU_SECRET_KEY')
         q = Auth(ak, sk)
