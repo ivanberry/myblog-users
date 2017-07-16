@@ -139,6 +139,10 @@ def get_user_status(resp):
 
     return make_response(jsonify(response_object)), 200
 
+@auth_blueprint.route('/qiniu', methods=['GET'])
+@get_upload_token
+def get_user_upload_token(resp):
+    return resp
 
 
 

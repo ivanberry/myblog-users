@@ -250,8 +250,3 @@ def add_single_user_articles():
         return make_response(jsonify(response_object)), 400
 
 
-@users_blueprint.route('/qiniu', methods=['GET'])
-@get_upload_token
-def get_user_upload_token(resp):
-    return resp
-
