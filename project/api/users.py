@@ -7,7 +7,7 @@ from sqlalchemy import exc
 #project depes
 from project.api.models import User, Article
 from project import db
-from project.api.utils import authenticate, is_admin
+from project.api.utils import authenticate, is_admin, get_upload_token
 
 import pdb
 
@@ -248,3 +248,10 @@ def add_single_user_articles():
             'message': 'invalid payload'
         }
         return make_response(jsonify(response_object)), 400
+
+
+@users_blueprint.route('/qiniu', methods=['GET'])
+@get_upload_token
+def get_user_upload_token(resp):
+    return resp
+

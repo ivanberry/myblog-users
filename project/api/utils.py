@@ -1,8 +1,11 @@
 #project/api/utils.py
 
+import os
 from functools import wraps
 from flask import request, make_response, jsonify
 from project.api.models import User
+
+from qiniu import Auth
 
 import pdb
 
@@ -34,3 +37,20 @@ def authenticate(f):
 def is_admin(user_id):
     user = User.query.filter_by(id=user_id).first()
     return user.admin
+
+def get_upload_token(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+
+        # pdb.set_trace()
+        ak = 'FyG9hqVJz1p8EEinxZ95gESWd63kv4RMxBRrcleC'
+        sk = os.environ.get('QINIU_SECRET_KEY')
+        q = Auth(ak, sk)
+        bucket_name='blog-article-images'
+        policy = {
+            'saveKey': '$(fname)'
+        }
+        token = q.upload_token(bucket_name, None, 3600, policy)
+        return f(token, *args, **kwargs)
+    return decorated_function
+

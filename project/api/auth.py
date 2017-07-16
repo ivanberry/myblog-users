@@ -7,14 +7,15 @@ from sqlalchemy import exc, or_
 #project depes
 from project.api.models import User
 from project import db, bcrypt
-from project.api.utils import authenticate
+from project.api.utils import authenticate, get_upload_token
 
 import pdb
 
 auth_blueprint = Blueprint('auth', __name__)
 
 @auth_blueprint.route('/auth/register', methods=['POST'])
-def register_user():
+@get_upload_token
+def register_user(q_token):
 
     #get the post data
     post_data = request.get_json()
@@ -41,8 +42,8 @@ def register_user():
             db.session.add(new_user)
             db.session.commit()
 
-            #generate auth token
-            auth_token = new_user.encode_auth_token(new_user.id)
+            #generate auth token and qiniu upload token that all included in JWT
+            auth_token = new_user.encode_auth_token(new_user.id, q_token)
             response_object = {
                 'status': 'success',
                 'message': 'Successfully registered',
@@ -72,7 +73,8 @@ def register_user():
         return make_response(jsonify(response_object)), 400
 
 @auth_blueprint.route('/auth/login', methods=['POST'])
-def login_user():
+@get_upload_token
+def login_user(q_token):
     #get post data
     post_data = request.get_json()
     # pdb.set_trace()
@@ -89,7 +91,7 @@ def login_user():
         #fetch data from db
         user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            user_token = user.encode_auth_token(user.id)
+            user_token = user.encode_auth_token(user.id, q_token)
             if user_token:
                 response_object = {
                     'status': 'success',
