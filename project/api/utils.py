@@ -46,7 +46,9 @@ def get_upload_token(f):
         q = Auth(ak, sk)
         bucket_name='blog-article-images'
         policy = {
-            'saveKey': '$(fname)'
+            'saveKey': '$(fname)',
+            'mimeLimit': 'image/*',
+            'fsizeLimit': 1024 * 1000
         }
         token = q.upload_token(bucket_name, None, 3600, policy)
         return f(token, *args, **kwargs)
