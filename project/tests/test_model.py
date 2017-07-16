@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from project import db
 from project.api.models import User
 from project.tests.base import BaseTestCase
-from project.tests.ultis import add_user
+from project.tests.ultis import add_user, get_upload_token
 
 class TestUserModel(BaseTestCase):
 
@@ -44,12 +44,14 @@ class TestUserModel(BaseTestCase):
 
     def test_encode_auth_token(self):
         user = add_user('test', 'tst@gmail.com', 'test')
-        auth_token = user.encode_auth_token(user.id)
+        q_token = get_upload_token();
+        auth_token = user.encode_auth_token(user.id, q_token)
         self.assertTrue(isinstance(auth_token, bytes))
 
     def test_decode_auth_token(self):
         user = add_user('test', 'ts@gmail.com', 'test')
-        auth_token = user.encode_auth_token(user.id)
+        q_token = get_upload_token()
+        auth_token = user.encode_auth_token(user.id, q_token)
         self.assertTrue(isinstance(auth_token, bytes))
         self.assertTrue(User.decode_auth_token(auth_token), user.id)
 

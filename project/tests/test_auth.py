@@ -6,7 +6,7 @@ import time
 from project import db
 from project.api.models import User
 from project.tests.base import BaseTestCase
-from project.tests.ultis import add_user
+from project.tests.ultis import add_user, get_upload_token
 
 class TestAuthBlueprint(BaseTestCase):
     def test_user_register(self):
