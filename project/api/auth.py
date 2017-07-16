@@ -14,8 +14,7 @@ import pdb
 auth_blueprint = Blueprint('auth', __name__)
 
 @auth_blueprint.route('/auth/register', methods=['POST'])
-@get_upload_token
-def register_user(q_token):
+def register_user():
 
     #get the post data
     post_data = request.get_json()
@@ -43,7 +42,7 @@ def register_user(q_token):
             db.session.commit()
 
             #generate auth token and qiniu upload token that all included in JWT
-            auth_token = new_user.encode_auth_token(new_user.id, q_token)
+            auth_token = new_user.encode_auth_token(new_user.id)
             response_object = {
                 'status': 'success',
                 'message': 'Successfully registered',
@@ -73,8 +72,7 @@ def register_user(q_token):
         return make_response(jsonify(response_object)), 400
 
 @auth_blueprint.route('/auth/login', methods=['POST'])
-@get_upload_token
-def login_user(q_token):
+def login_user():
     #get post data
     post_data = request.get_json()
     # pdb.set_trace()
@@ -91,7 +89,7 @@ def login_user(q_token):
         #fetch data from db
         user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            user_token = user.encode_auth_token(user.id, q_token)
+            user_token = user.encode_auth_token(user.id)
             if user_token:
                 response_object = {
                     'status': 'success',

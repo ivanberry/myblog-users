@@ -36,9 +36,8 @@ class User(db.Model):
             return 'Invalid token. Please log in again'
 
 
-    def encode_auth_token(self, *args):
+    def encode_auth_token(self, user_id):
         '''Generate user auth token'''
-        user_id, q_token = args
 
         try:
             payload = {
@@ -47,8 +46,7 @@ class User(db.Model):
                     seconds=current_app.config.get('TOKEN_EXPIRATION_SECONDS')
                 ),
                 'iat': datetime.datetime.now(),
-                'sub': user_id,
-                'qtk': q_token
+                'sub': user_id
             }
 
             user_token = jwt.encode(
