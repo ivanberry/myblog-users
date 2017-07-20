@@ -28,7 +28,7 @@ def authenticate(f):
             response_object['message'] = resp
             return make_response(jsonify(response_object)), code
         user = User.query.filter_by(id=resp).first()
-        if not user or not user.active:
+        if not user or user.active:
             return make_response(jsonify(response_object)), code
         return f(resp, *args, **kwargs)
     return decorated_function

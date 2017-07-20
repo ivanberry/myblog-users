@@ -268,7 +268,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data['data'] is not None)
             self.assertTrue(data['data']['username'] == 'test')
             self.assertTrue(data['data']['email'] == 'test@gmail.com')
-            self.assertTrue(data['data']['active'] == True)
+            self.assertTrue(data['data']['active'] == False)
             self.assertTrue(data['data']['created_at'])
             self.assertEqual(response.status_code, 200)
 
@@ -291,7 +291,7 @@ class TestAuthBlueprint(BaseTestCase):
         add_user('test', 'test@gmail.com', 'test')
         #update_user
         user = User.query.filter_by(email='test@gmail.com').first()
-        user.active = False
+        user.active = True
         db.session.commit()
         with self.client:
             resp_login = self.client.post(

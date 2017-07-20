@@ -35,7 +35,7 @@ class TestUsersService(BaseTestCase):
         self.assertTrue(user.email, 'test@gmail.com')
         self.assertTrue(user.username, 'test')
         self.assertTrue(user.password)
-        self.assertTrue(user.active)
+        self.assertFalse(user.active)
         self.assertTrue(user.created_at)
         self.assertTrue(user.admin == False)
 
@@ -323,7 +323,7 @@ class TestUsersService(BaseTestCase):
         user = User.query.filter_by(email='test@gmail.com').first()
 
         #set user active to False
-        user.active = False
+        user.active = True
         db.session.commit()
 
         with self.client:
