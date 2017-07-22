@@ -344,6 +344,7 @@ class TestAuthBlueprint(BaseTestCase):
     #         self.assertTrue(response.status_code, 200)
     #         self.assertTrue(data['status'], 'success')
     #         self.assertTrue(data['q_token'])
+            
 
 
 
