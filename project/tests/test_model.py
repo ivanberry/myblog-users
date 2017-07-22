@@ -42,16 +42,16 @@ class TestUserModel(BaseTestCase):
         user_two = add_user('test@test2.com', 'test2@gmail.com', 'test')
         self.assertNotEqual(user_one.password, user_two.password)
 
-    def test_encode_auth_token(self):
-        user = add_user('test', 'tst@gmail.com', 'test')
-        q_token = get_upload_token();
-        auth_token = user.encode_auth_token(user.id)
-        self.assertTrue(isinstance(auth_token, bytes))
+    # def test_encode_auth_token(self):
+    #     user = add_user('test', 'tst@gmail.com', 'test')
+    #     q_token = get_upload_token();
+    #     auth_token = user.encode_auth_token(user.id)
+    #     self.assertTrue(isinstance(auth_token, bytes))
 
-    def test_decode_auth_token(self):
-        user = add_user('test', 'ts@gmail.com', 'test')
-        q_token = get_upload_token()
-        auth_token = user.encode_auth_token(user.id)
-        self.assertTrue(isinstance(auth_token, bytes))
-        self.assertTrue(User.decode_auth_token(auth_token), user.id)
+    # def test_decode_auth_token(self):
+    #     user = add_user('test', 'ts@gmail.com', 'test')
+    #     q_token = get_upload_token()
+    #     auth_token = user.encode_auth_token(user.id)
+    #     self.assertTrue(isinstance(auth_token, bytes))
+    #     self.assertTrue(User.decode_auth_token(auth_token), user.id)
 
